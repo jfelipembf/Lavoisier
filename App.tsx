@@ -1,20 +1,40 @@
+import 'react-native-gesture-handler';
+import { useFonts } from 'expo-font';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
+import Store from './app/Redux/Store';
+import Routes from './app/Navigations/Route';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const App = () =>{
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+	const [loaded] = useFonts({
+      NunitoSansRegular: require('./app/assets/fonts/NunitoSans-Regular.ttf'),
+      NunitoSansBold : require('./app/assets/fonts/NunitoSans-Bold.ttf'),
+      NunitoSansSemiBold : require('./app/assets/fonts/NunitoSans-SemiBold.ttf'),
+      PoppinsSemiBold : require('./app/assets/fonts/Poppins-SemiBold.ttf'),
+      PoppinsMedium : require('./app/assets/fonts/Poppins-Medium.ttf'),
+	});  
+
+	if(!loaded){
+		  return null;
+	}
+  
+	return (
+		 <SafeAreaProvider>
+        <SafeAreaView
+          style={{
+            flex: 1,
+          }}
+        >
+            <StatusBar style="dark" />
+              <Provider store={Store}>
+                <Routes/>
+              </Provider>
+        </SafeAreaView>
+		</SafeAreaProvider>
+	);
+};
+
+export default App;
