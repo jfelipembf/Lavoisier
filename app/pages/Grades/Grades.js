@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useTheme } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import useUser from '../../hooks/useUser';
 import Header from '../../layout/Header';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
-import ListStyle1 from '../../components/list/ListStyle1';
+import Auth from '../../Service/Auth';
 
-// Cores pastéis personalizadas
 const PASTEL_COLORS = {
   blue: '#cee7e6',    // Azul pastel
   green: '#eae3ef',   // Verde pastel
@@ -16,68 +16,73 @@ const PASTEL_COLORS = {
   yellow: '#f3dfde',  // Amarelo pastel
 };
 
-const Grade = () => {
+const Grades = () => {
+  const navigation = useNavigation();
   const { colors } = useTheme();
+  const { user, loading } = useUser();
+  const [userGrades, setUserGrades] = useState(null);
+  const [collapsedStates, setCollapsedStates] = useState({});
+  const [selectedUnit, setSelectedUnit] = useState('Unidade1');
 
-  // Estados para controlar o colapso de cada disciplina
-  const [collapsedMath, setCollapsedMath] = useState(true);
-  const [collapsedPortuguese, setCollapsedPortuguese] = useState(true);
-  const [collapsedHistory, setCollapsedHistory] = useState(true);
-  const [collapsedScience, setCollapsedScience] = useState(true);
+  useEffect(() => {
+    if (user?.notas) {
+      console.log('=== GRADES: DADOS DO USUÁRIO ===');
+      console.log('user:', JSON.stringify(user, null, 2));
+      
+      // Usar as notas diretamente do usuário
+      setUserGrades(user.notas);
+      
+      // Inicializar estados de collapse
+      const initialCollapsedStates = {};
+      Object.keys(user.notas).forEach(disciplina => {
+        initialCollapsedStates[disciplina] = true;
+      });
+      setCollapsedStates(initialCollapsedStates);
+    }
+  }, [user]);
 
-  // Estado para controlar a unidade selecionada
-  const [selectedUnit, setSelectedUnit] = useState('Unidade 1');
-
-  // Dados das notas para cada unidade e disciplina (4 unidades)
-  const grades = {
-    'Unidade 1': {
-      matematica: { final: 8.5, prova: 5.0, simulados: 2.0, trabalhos: 1.5 },
-      portugues: { final: 9.0, prova: 5.0, simulados: 3.0, trabalhos: 1.0 },
-      historia: { final: 7.5, prova: 4.0, simulados: 2.0, trabalhos: 1.5 },
-      ciencias: { final: 8.0, prova: 4.5, simulados: 2.0, trabalhos: 1.5 },
-    },
-    'Unidade 2': {
-      matematica: { final: 7.5, prova: 4.5, simulados: 2.0, trabalhos: 1.0 },
-      portugues: { final: 8.5, prova: 4.5, simulados: 3.0, trabalhos: 1.0 },
-      historia: { final: 8.0, prova: 5.0, simulados: 2.0, trabalhos: 1.0 },
-      ciencias: { final: 7.0, prova: 3.5, simulados: 2.0, trabalhos: 1.5 },
-    },
-    'Unidade 3': {
-      matematica: { final: 9.0, prova: 5.5, simulados: 2.5, trabalhos: 1.0 },
-      portugues: { final: 8.0, prova: 4.0, simulados: 3.0, trabalhos: 1.0 },
-      historia: { final: 7.0, prova: 4.0, simulados: 2.0, trabalhos: 1.0 },
-      ciencias: { final: 8.5, prova: 5.0, simulados: 2.0, trabalhos: 1.5 },
-    },
-    'Unidade 4': {
-      matematica: { final: 8.0, prova: 4.5, simulados: 2.0, trabalhos: 1.5 },
-      portugues: { final: 9.5, prova: 5.5, simulados: 3.0, trabalhos: 1.0 },
-      historia: { final: 8.0, prova: 4.5, simulados: 2.0, trabalhos: 1.5 },
-      ciencias: { final: 7.5, prova: 4.0, simulados: 2.0, trabalhos: 1.5 },
-    },
+  const toggleCollapsed = (disciplina) => {
+    setCollapsedStates(prev => ({
+      ...prev,
+      [disciplina]: !prev[disciplina]
+    }));
   };
 
+  if (loading || !userGrades) {
+    return (
+      <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#F8F9FA'}]}>
+        <Header title={'Notas'} titleLeft />
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text>Carregando notas...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Obter unidades disponíveis da primeira disciplina
+  const unidades = Object.keys(Object.values(userGrades)[0] || {});
+
   return (
-    <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
+    <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#F8F9FA'}]}>
       <Header title={'Notas'} titleLeft />
-      
-      <ScrollView style={{backgroundColor: '#FFFFFF'}} contentContainerStyle={{paddingBottom: 100}}>
-        <View style={{flex:1, backgroundColor: '#FFFFFF'}}>
+      <View style={styles.container}>
+        <View style={styles.content}>
           <View style={GlobalStyleSheet.container}>
             {/* Área de Tabs para selecionar a unidade */}
             <View style={styles.tabsContainer}>
-              {Object.keys(grades).map((unit) => (
+              {unidades.map((unit) => (
                 <TouchableOpacity
                   key={unit}
                   style={[
                     styles.tab,
-                    { backgroundColor: selectedUnit === unit ? PASTEL_COLORS.blue : '#FFFFFF' },
+                    selectedUnit === unit && styles.selectedTab
                   ]}
                   onPress={() => setSelectedUnit(unit)}
                 >
                   <Text
                     style={[
                       styles.tabText,
-                      { color: selectedUnit === unit ? '#444444' : '#666666' },
+                      selectedUnit === unit && styles.selectedTabText
                     ]}
                   >
                     {unit}
@@ -87,154 +92,67 @@ const Grade = () => {
             </View>
 
             <View style={styles.gradesContainer}>
-              {/* Disciplina: Matemática */}
-              <View style={styles.gradeCard}>
-                <TouchableOpacity 
-                  style={[styles.gradeHeader, { backgroundColor: PASTEL_COLORS.blue }]}
-                  onPress={() => setCollapsedMath(!collapsedMath)}
-                >
-                  <FontAwesome name={'calculator'} size={15} color={'#444444'} />
-                  <Text style={styles.gradeTitle}>Matemática</Text>
-                  <View style={styles.gradeEndContainer}>
-                    <Text style={styles.gradeTitle}>{grades[selectedUnit].matematica.final}</Text>
+              {Object.entries(userGrades).map(([disciplina, notas], index) => (
+                <View key={disciplina} style={styles.gradeCard}>
+                  <TouchableOpacity 
+                    style={[styles.gradeHeader, { backgroundColor: Object.values(PASTEL_COLORS)[index % 4] }]}
+                    onPress={() => toggleCollapsed(disciplina)}
+                  >
                     <FontAwesome 
-                      name={collapsedMath ? 'chevron-down' : 'chevron-up'} 
-                      size={8} 
+                      name={disciplina.toLowerCase().includes('mat') ? 'calculator' : 
+                            disciplina.toLowerCase().includes('port') ? 'book' :
+                            disciplina.toLowerCase().includes('hist') ? 'history' :
+                            disciplina.toLowerCase().includes('cienc') ? 'flask' : 'book'} 
+                      size={15} 
                       color={'#444444'} 
                     />
-                  </View>
-                </TouchableOpacity>
-                <Collapsible collapsed={collapsedMath}>
-                  <View style={styles.gradeDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Prova</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].matematica.prova}</Text>
+                    <Text style={styles.gradeTitle}>{disciplina}</Text>
+                    <View style={styles.gradeEndContainer}>
+                      <Text style={styles.gradeTitle}>
+                        {notas[selectedUnit]?.final || '0.0'}
+                      </Text>
+                      <FontAwesome 
+                        name={collapsedStates[disciplina] ? 'chevron-down' : 'chevron-up'} 
+                        size={8} 
+                        color={'#444444'} 
+                      />
                     </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Simulados</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].matematica.simulados}</Text>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={collapsedStates[disciplina]}>
+                    <View style={styles.gradeDetails}>
+                      {Object.entries(notas[selectedUnit] || {}).map(([tipo, valor]) => (
+                        tipo !== 'final' && (
+                          <View key={tipo} style={styles.detailRow}>
+                            <Text style={styles.detailLabel}>
+                              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                            </Text>
+                            <Text style={styles.detailValue}>
+                              {valor || '0.0'}
+                            </Text>
+                          </View>
+                        )
+                      ))}
                     </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Trabalhos</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].matematica.trabalhos}</Text>
-                    </View>
-                  </View>
-                </Collapsible>
-              </View>
-
-              {/* Disciplina: Português */}
-              <View style={styles.gradeCard}>
-                <TouchableOpacity 
-                  style={[styles.gradeHeader, { backgroundColor: PASTEL_COLORS.green }]}
-                  onPress={() => setCollapsedPortuguese(!collapsedPortuguese)}
-                >
-                  <FontAwesome name={'book'} size={15} color={'#444444'} />
-                  <Text style={styles.gradeTitle}>Português</Text>
-                  <View style={styles.gradeEndContainer}>
-                    <Text style={styles.gradeTitle}>{grades[selectedUnit].portugues.final}</Text>
-                    <FontAwesome 
-                      name={collapsedPortuguese ? 'chevron-down' : 'chevron-up'} 
-                      size={8} 
-                      color={'#444444'} 
-                    />
-                  </View>
-                </TouchableOpacity>
-                <Collapsible collapsed={collapsedPortuguese}>
-                  <View style={styles.gradeDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Prova</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].portugues.prova}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Simulados</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].portugues.simulados}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Trabalhos</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].portugues.trabalhos}</Text>
-                    </View>
-                  </View>
-                </Collapsible>
-              </View>
-
-              {/* Disciplina: História */}
-              <View style={styles.gradeCard}>
-                <TouchableOpacity 
-                  style={[styles.gradeHeader, { backgroundColor: PASTEL_COLORS.yellow }]}
-                  onPress={() => setCollapsedHistory(!collapsedHistory)}
-                >
-                  <FontAwesome name={'history'} size={15} color={'#444444'} />
-                  <Text style={styles.gradeTitle}>História</Text>
-                  <View style={styles.gradeEndContainer}>
-                    <Text style={styles.gradeTitle}>{grades[selectedUnit].historia.final}</Text>
-                    <FontAwesome 
-                      name={collapsedHistory ? 'chevron-down' : 'chevron-up'} 
-                      size={8} 
-                      color={'#444444'} 
-                    />
-                  </View>
-                </TouchableOpacity>
-                <Collapsible collapsed={collapsedHistory}>
-                  <View style={styles.gradeDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Prova</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].historia.prova}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Simulados</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].historia.simulados}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Trabalhos</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].historia.trabalhos}</Text>
-                    </View>
-                  </View>
-                </Collapsible>
-              </View>
-
-              {/* Disciplina: Ciências */}
-              <View style={styles.gradeCard}>
-                <TouchableOpacity 
-                  style={[styles.gradeHeader, { backgroundColor: PASTEL_COLORS.red }]}
-                  onPress={() => setCollapsedScience(!collapsedScience)}
-                >
-                  <FontAwesome name={'flask'} size={15} color={'#444444'} />
-                  <Text style={styles.gradeTitle}>Ciências</Text>
-                  <View style={styles.gradeEndContainer}>
-                    <Text style={styles.gradeTitle}>{grades[selectedUnit].ciencias.final}</Text>
-                    <FontAwesome 
-                      name={collapsedScience ? 'chevron-down' : 'chevron-up'} 
-                      size={8} 
-                      color={'#444444'} 
-                    />
-                  </View>
-                </TouchableOpacity>
-                <Collapsible collapsed={collapsedScience}>
-                  <View style={styles.gradeDetails}>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Prova</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].ciencias.prova}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Simulados</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].ciencias.simulados}</Text>
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Trabalhos</Text>
-                      <Text style={styles.detailValue}>{grades[selectedUnit].ciencias.trabalhos}</Text>
-                    </View>
-                  </View>
-                </Collapsible>
-              </View>
+                  </Collapsible>
+                </View>
+              ))}
             </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA'
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
   tabsContainer: {
     flexDirection: 'row',
     marginBottom: 15,
@@ -250,9 +168,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: SIZES.radius - 5,
   },
+  selectedTab: {
+    backgroundColor: '#EEEEEE',
+  },
   tabText: {
     ...FONTS.fontSm,
     fontWeight: '600',
+  },
+  selectedTabText: {
+    color: '#444444',
   },
   gradesContainer: {
     paddingHorizontal: 5,
@@ -303,6 +227,99 @@ const styles = StyleSheet.create({
     color: '#444444',
     fontWeight: '600',
   },
+  disciplinaHeader: {
+    backgroundColor: '#4318FF',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  disciplinaNome: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  unidadeContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.20,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  unidadeHeader: {
+    backgroundColor: '#F4F7FE',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  unidadeNome: {
+    color: '#2B3674',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  notaContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9EDF7',
+  },
+  notaTipo: {
+    color: '#2B3674',
+    fontSize: 14,
+  },
+  notaValor: {
+    color: '#4318FF',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  scrollContainer: {
+    padding: 15,
+  },
+  headerContainer: {
+    backgroundColor: '#4318FF',
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    marginBottom: 15,
+  },
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    color: '#E9EDF7',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  noGradesText: {
+    color: '#2B3674',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  }
 });
 
-export default Grade;
+export default Grades;

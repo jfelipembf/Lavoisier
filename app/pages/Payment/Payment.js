@@ -63,7 +63,7 @@ const Payment = ({ route }) => {
                 setUserId(data.id);
             }
         } catch (error) {
-            console.log('Erro ao buscar usuário:', error);
+            ('Erro ao buscar usuário:', error);
         }
     };
 

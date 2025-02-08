@@ -55,7 +55,7 @@ const VideoAulas = ({ navigation }) => {
         <TouchableOpacity
             key={aula.titulo}
             style={[styles.aulaCard, { backgroundColor: disciplinaColor }]}
-            onPress={() => console.log(`Abrindo aula: ${aula.titulo}`)}
+            onPress={() => (`Abrindo aula: ${aula.titulo}`)}
         >
             <View style={styles.aulaInfo}>
                 <Text style={[styles.aulaTitulo, { color: colors.title }]}>{aula.titulo}</Text>

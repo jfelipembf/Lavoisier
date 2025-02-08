@@ -100,13 +100,13 @@ const EditProfile = () => {
     // Atualiza os estados quando os dados do usuário são carregados
     useEffect(() => {
         if (userData) {
-            console.log('==== DADOS DO USUÁRIO NO EDITPROFILE ====');
-            console.log('Dados brutos do hook:', userData);
+            ('==== DADOS DO USUÁRIO NO EDITPROFILE ====');
+            ('Dados brutos do hook:', userData);
             
             // Remove o sufixo "- Fundamental" se existir
             const normalizedSchoolYear = userData.schoolYear ? userData.schoolYear.replace(' - Fundamental', '') : '';
-            console.log('Série normalizada:', normalizedSchoolYear);
-            console.log('A série normalizada está na lista?', schoolYears.includes(normalizedSchoolYear));
+            ('Série normalizada:', normalizedSchoolYear);
+            ('A série normalizada está na lista?', schoolYears.includes(normalizedSchoolYear));
             
             setImgUrl(userData.img || '');
             setName(userData.name || '');
@@ -137,7 +137,7 @@ const EditProfile = () => {
             try {
                 const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 if (status !== 'granted') {
-                    console.log('Permission to access media library is required!');
+                    ('Permission to access media library is required!');
                     return;
                 }
     
@@ -196,7 +196,7 @@ const EditProfile = () => {
     const handleSaveProfile = async () => {
         try {
             setLoading(true);
-            console.log('Iniciando salvamento do perfil...');
+            ('Iniciando salvamento do perfil...');
 
             // Validações básicas
             if (!userId) {
@@ -237,20 +237,20 @@ const EditProfile = () => {
                 updatedAt: new Date().toISOString()
             };
 
-            console.log('Dados a serem salvos:', updatedUserData);
+            ('Dados a serem salvos:', updatedUserData);
 
             // Atualiza no Realtime Database
             const userRef = ref(database, `users/${userId}`);
             await update(userRef, updatedUserData);
-            console.log('Dados atualizados no Realtime Database');
+            ('Dados atualizados no Realtime Database');
 
             // Atualiza no AsyncStorage
             await Auth.setAccount(updatedUserData);
-            console.log('Dados atualizados no AsyncStorage');
+            ('Dados atualizados no AsyncStorage');
 
             // Atualiza os dados no hook
             await refreshUser();
-            console.log('Dados atualizados no hook');
+            ('Dados atualizados no hook');
 
             Alert.alert('Sucesso', 'Perfil atualizado com sucesso');
             setLoading(false);

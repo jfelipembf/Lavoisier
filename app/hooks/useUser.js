@@ -7,28 +7,47 @@ const useUser = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const loadUser = async () => {
             try {
-                ('useUser: Buscando dados do usuário');
+                ('==== HOOK: BUSCANDO DADOS DO USUÁRIO ====');
                 const account = await Auth.getAccount();
                 
                 if (account) {
-                    const parsedAccount = JSON.parse(account);
-                    ('useUser: Dados encontrados:', parsedAccount);
-                    setUser(parsedAccount);
+                    try {
+                        // Garantir que temos um objeto limpo
+                        const userData = JSON.parse(account);
+                        ('==== HOOK: DADOS DO USUÁRIO ====');
+                        ('Dados:', JSON.stringify(userData, null, 2));
+
+                        // Atualizar notas apenas se não existirem ou se faltarem disciplinas base
+                        if (userData.id && (!userData.notas || !userData.notas.portugues || !userData.notas['Matemática'])) {
+                            try {
+                                const updatedUserData = await Auth.updateUserGrades(userData.id);
+                                setUser(updatedUserData);
+                            } catch (error) {
+                                console.error('Erro ao atualizar notas:', error);
+                                setUser(userData);
+                            }
+                        } else {
+                            setUser(userData);
+                        }
+                    } catch (parseError) {
+                        console.error('Erro ao fazer parse dos dados:', parseError);
+                        setError(parseError);
+                    }
                 } else {
-                    ('useUser: Nenhum dado encontrado');
+                    ('==== HOOK: NENHUM DADO ENCONTRADO ====');
                     setUser(null);
                 }
             } catch (err) {
-                console.error('useUser: Erro ao buscar dados:', err);
+                console.error('==== HOOK: ERRO AO BUSCAR DADOS ====', err);
                 setError(err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUser();
+        loadUser();
     }, []);
 
     return {
