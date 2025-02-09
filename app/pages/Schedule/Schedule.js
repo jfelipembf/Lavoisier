@@ -1,3 +1,12 @@
+/**
+ * Schedule (Agenda)
+ * 
+ * Responsabilidade: Exibir e gerenciar atividades e tarefas dos alunos
+ * - Mostra atividades em sala e tarefas de casa
+ * - Permite marcar atividades como concluídas
+ * - Usa o hook useActivities para gerenciar os dados
+ */
+
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
@@ -10,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import Collapsible from 'react-native-collapsible';
 import { useNavigation } from '@react-navigation/native';
-import useSchedule from '../../hooks/useSchedule';
+import useActivities from '../../hooks/useActivities';
 
 moment.locale('pt-br');
 
@@ -29,7 +38,7 @@ const Schedule = () => {
     const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
     const [isCalendarCollapsed, setIsCalendarCollapsed] = useState(true);
     const [updatingActivity, setUpdatingActivity] = useState(null);
-    const { activities, loading, error, markActivityAsComplete, getActivityStats } = useSchedule();
+    const { activities, loading, error, markActivityAsComplete } = useActivities();
 
     const onDayPress = (day) => {
         setSelectedDate(day.dateString);

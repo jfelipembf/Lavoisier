@@ -66,24 +66,22 @@ const Profile1 = () => {
         setImageUrl(data.img);
     }
 
-    const handleLogout = () => {
-        Alert.alert(
-            "Sair",
-            "Tem certeza que deseja sair?",
-            [
-                {
-                    text: "Cancelar",
-                    style: "cancel"
-                },
-                {
-                    text: "Sim",
-                    onPress: async () => {
-                        await Auth.logout();
-                        navigation.replace('SignIn');
-                    }
-                }
-            ]
-        );
+    const handleLogout = async () => {
+        try {
+            await Auth.logout();
+            // Limpar a pilha de navegação e ir para a tela de login
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'SignIn' }],
+            });
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+            if (Platform.OS === 'android') {
+                ToastAndroid.show('Erro ao fazer logout', ToastAndroid.LONG);
+            } else {
+                Alert.alert('Erro', 'Não foi possível completar o logout');
+            }
+        }
     };
 
     return(

@@ -4,7 +4,7 @@ import { get, push, ref, set, update } from 'firebase/database';
 async function createNotice(noticeData) {
     try {
         // Criar referência para o novo aviso
-        const noticesRef = ref(database, `notices/${noticeData.schoolYear}`);
+        const noticesRef = ref(database, `notices/${noticeData.schoolYear}/${noticeData.class}`);
         const newNoticeRef = push(noticesRef);
         const noticeId = newNoticeRef.key;
         
@@ -17,7 +17,8 @@ async function createNotice(noticeData) {
             shift: noticeData.shift,
             createdAt: new Date().toISOString(),
             createdBy: noticeData.createdBy,
-            status: 'active'
+            status: 'active',
+            class: noticeData.class
         };
 
         await set(newNoticeRef, notice);
@@ -27,9 +28,9 @@ async function createNotice(noticeData) {
     }
 }
 
-async function getNoticesBySchoolYear(schoolYear) {
+async function getNoticesBySchoolYear(schoolYear, userClass) {
     try {
-        const noticesRef = ref(database, `notices/${schoolYear}`);
+        const noticesRef = ref(database, `notices/${schoolYear}/${userClass}`);
         const snapshot = await get(noticesRef);
         
         if (!snapshot.exists()) {
@@ -56,10 +57,10 @@ async function getNoticesBySchoolYear(schoolYear) {
     }
 }
 
-async function deactivateNotice(schoolYear, noticeId) {
+async function deactivateNotice(schoolYear, userClass, noticeId) {
     try {
         const updates = {
-            [`notices/${schoolYear}/${noticeId}/status`]: 'inactive'
+            [`notices/${schoolYear}/${userClass}/${noticeId}/status`]: 'inactive'
         };
 
         await update(ref(database), updates);

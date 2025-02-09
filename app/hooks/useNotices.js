@@ -9,7 +9,7 @@ const useNotices = () => {
     const { user } = useUser();
 
     const loadNotices = async () => {
-        if (!user?.schoolYear) {
+        if (!user?.schoolYear || !user?.class) {
             setNotices([]);
             setLoading(false);
             return;
@@ -17,7 +17,7 @@ const useNotices = () => {
 
         try {
             setLoading(true);
-            const userNotices = await NoticesService.getNoticesBySchoolYear(user.schoolYear);
+            const userNotices = await NoticesService.getNoticesBySchoolYear(user.schoolYear, user.class);
             setNotices(userNotices);
         } catch (err) {
             console.error('Erro ao carregar avisos:', err);

@@ -4,28 +4,90 @@
       "name": "Colégio Lavoisier - Aracaju",
       "address": "Rua Principal, 123",
       "city": "Aracaju",
-      "state": "SE"
+      "state": "SE",
+      "phone": "(11) 98765-4321",
+      "staff": {
+        "teachers": {
+          "math_001": {
+            "id": "prof_001",
+            "name": "Carlos Ferreira",
+            "email": "carlos.ferreira@lavoisier.edu.br",
+            "phone": "(11) 98765-4325",
+            "role": "Professor de Matemática",
+            "photo": "carlos_ferreira.jpg",
+            "subjects": ["Matemática"],
+            "segments": ["Fundamental II", "Médio"],
+            "classes": {
+              "9": ["A", "B"],
+              "1": ["A"]
+            },
+            "schedule": {
+              "availability": "Manhã e Tarde",
+              "rooms": ["Sala 101", "Sala 102", "Lab Mat"]
+            }
+          },
+          "port_001": {
+            "id": "prof_002",
+            "name": "Mariana Lima",
+            "email": "mariana.lima@lavoisier.edu.br",
+            "phone": "(11) 98765-4326",
+            "role": "Professora de Português",
+            "photo": "mariana_lima.jpg",
+            "subjects": ["Português", "Literatura"],
+            "segments": ["Fundamental II", "Médio"],
+            "classes": {
+              "9": ["A"],
+              "1": ["A", "B"]
+            },
+            "schedule": {
+              "availability": "Manhã",
+              "rooms": ["Sala 201", "Sala 202"]
+            }
+          },
+          "sci_001": {
+            "id": "prof_003",
+            "name": "Roberto Alves",
+            "email": "roberto.alves@lavoisier.edu.br",
+            "phone": "(11) 98765-4327",
+            "role": "Professor de Ciências",
+            "photo": "roberto_alves.jpg",
+            "subjects": ["Ciências", "Biologia"],
+            "segments": ["Fundamental II", "Médio"],
+            "classes": {
+              "9": ["A", "B"],
+              "1": ["A"]
+            },
+            "schedule": {
+              "availability": "Manhã e Tarde",
+              "rooms": ["Lab Ciências", "Sala 301"]
+            }
+          }
+        }
+      }
     }
   },
   "classes": {
     "lavoisier-aracaju": {
       "Jardim I": {
         "A": {
+          "segment": "Jardim I",
+          "class": "A",
           "shift": "Manhã",
-          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-          "students": ["-OI83aT8nL5QBMVKQvnG"]
+          "teachers": ["math_001", "port_001"]
         },
         "B": {
+          "segment": "Jardim I",
+          "class": "B",
           "shift": "Tarde",
-          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-          "students": ["-OIS3ncMIr-GxnrllOso"]
+          "teachers": ["math_001", "port_001"]
         }
       },
       "Maternal III": {
         "A": {
+          "segment": "Maternal III",
+          "class": "A",
           "shift": "Manhã",
-          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-          "students": []
+          "teachers": ["math_001", "port_001"]
         }
       }
     }
@@ -361,5 +423,251 @@
       "Tarde",
       "Integral"
     ]
+  },
+  "timetable": {
+    "lavoisier-aracaju": {
+      "Jardim I": {
+        "A": {
+          "Manhã": {
+            "Segunda": [
+              {
+                "startTime": "07:30",
+                "endTime": "08:20",
+                "subject": "Coordenação Motora",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "08:20",
+                "endTime": "09:10",
+                "subject": "Matemática",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "09:10",
+                "endTime": "09:30",
+                "subject": "Intervalo",
+                "isBreak": true
+              },
+              {
+                "startTime": "09:30",
+                "endTime": "10:20",
+                "subject": "Português",
+                "teacher": "port_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "10:20",
+                "endTime": "11:10",
+                "subject": "Artes",
+                "teacher": "art_001",
+                "room": "Sala de Artes"
+              }
+            ],
+            "Terça": [
+              {
+                "startTime": "07:30",
+                "endTime": "08:20",
+                "subject": "Português",
+                "teacher": "port_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "08:20",
+                "endTime": "09:10",
+                "subject": "Inglês",
+                "teacher": "eng_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "09:10",
+                "endTime": "09:30",
+                "subject": "Intervalo",
+                "isBreak": true
+              },
+              {
+                "startTime": "09:30",
+                "endTime": "10:20",
+                "subject": "Música",
+                "teacher": "mus_001",
+                "room": "Sala de Música"
+              },
+              {
+                "startTime": "10:20",
+                "endTime": "11:10",
+                "subject": "Matemática",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              }
+            ],
+            "Quarta": [
+              {
+                "startTime": "07:30",
+                "endTime": "08:20",
+                "subject": "Educação Física",
+                "teacher": "edu_001",
+                "room": "Quadra"
+              },
+              {
+                "startTime": "08:20",
+                "endTime": "09:10",
+                "subject": "Coordenação Motora",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "09:10",
+                "endTime": "09:30",
+                "subject": "Intervalo",
+                "isBreak": true
+              },
+              {
+                "startTime": "09:30",
+                "endTime": "10:20",
+                "subject": "Português",
+                "teacher": "port_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "10:20",
+                "endTime": "11:10",
+                "subject": "Matemática",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              }
+            ],
+            "Quinta": [
+              {
+                "startTime": "07:30",
+                "endTime": "08:20",
+                "subject": "Matemática",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "08:20",
+                "endTime": "09:10",
+                "subject": "Artes",
+                "teacher": "art_001",
+                "room": "Sala de Artes"
+              },
+              {
+                "startTime": "09:10",
+                "endTime": "09:30",
+                "subject": "Intervalo",
+                "isBreak": true
+              },
+              {
+                "startTime": "09:30",
+                "endTime": "10:20",
+                "subject": "Inglês",
+                "teacher": "eng_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "10:20",
+                "endTime": "11:10",
+                "subject": "Português",
+                "teacher": "port_001",
+                "room": "Sala 1"
+              }
+            ],
+            "Sexta": [
+              {
+                "startTime": "07:30",
+                "endTime": "08:20",
+                "subject": "Música",
+                "teacher": "mus_001",
+                "room": "Sala de Música"
+              },
+              {
+                "startTime": "08:20",
+                "endTime": "09:10",
+                "subject": "Educação Física",
+                "teacher": "edu_001",
+                "room": "Quadra"
+              },
+              {
+                "startTime": "09:10",
+                "endTime": "09:30",
+                "subject": "Intervalo",
+                "isBreak": true
+              },
+              {
+                "startTime": "09:30",
+                "endTime": "10:20",
+                "subject": "Coordenação Motora",
+                "teacher": "math_001",
+                "room": "Sala 1"
+              },
+              {
+                "startTime": "10:20",
+                "endTime": "11:10",
+                "subject": "Português",
+                "teacher": "port_001",
+                "room": "Sala 1"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "notices": {
+    "Jardim I": {
+      "A": {
+        "-noticeId1": {
+          "title": "Reunião de Pais",
+          "content": "Prezados pais, convidamos para a reunião que acontecerá no dia 15/02/2025 às 19h",
+          "date": "2025-02-15T19:00:00-03:00",
+          "time": "19:00",
+          "shift": "Noite",
+          "createdAt": "2025-02-09T15:12:11-03:00",
+          "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+          "status": "active",
+          "class": "A"
+        },
+        "-noticeId2": {
+          "title": "Festa de Carnaval",
+          "content": "No dia 12/02/2025 teremos nossa festa de carnaval. As crianças podem vir fantasiadas!",
+          "date": "2025-02-12T08:00:00-03:00",
+          "time": "08:00",
+          "shift": "Manhã",
+          "createdAt": "2025-02-09T15:12:11-03:00",
+          "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+          "status": "active",
+          "class": "A"
+        }
+      },
+      "B": {
+        "-noticeId4": {
+          "title": "Festa de Carnaval",
+          "content": "No dia 12/02/2025 teremos nossa festa de carnaval. As crianças podem vir fantasiadas!",
+          "date": "2025-02-12T13:00:00-03:00",
+          "time": "13:00",
+          "shift": "Tarde",
+          "createdAt": "2025-02-09T15:12:11-03:00",
+          "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+          "status": "active",
+          "class": "B"
+        }
+      }
+    },
+    "Maternal III": {
+      "A": {
+        "-noticeId3": {
+          "title": "Passeio ao Zoológico",
+          "content": "No dia 20/02/2025 faremos um passeio ao zoológico. Por favor, enviar autorização até dia 15/02.",
+          "date": "2025-02-20T08:00:00-03:00",
+          "time": "08:00",
+          "shift": "Manhã",
+          "createdAt": "2025-02-09T15:12:11-03:00",
+          "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+          "status": "active",
+          "class": "A"
+        }
+      }
+    }
   }
 }

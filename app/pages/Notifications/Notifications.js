@@ -47,6 +47,9 @@ const NoticeItem = ({ notice }) => {
                         <Text style={styles.expandedLabel}>Turno:</Text>
                         <Text style={styles.expandedValue}>{notice.shift}</Text>
                         
+                        <Text style={styles.expandedLabel}>Turma:</Text>
+                        <Text style={styles.expandedValue}>{notice.class}</Text>
+                        
                         <Text style={styles.expandedLabel}>Status:</Text>
                         <Text style={[styles.expandedValue, { color: notice.status === 'active' ? COLORS.success : COLORS.danger }]}>
                             {notice.status === 'active' ? 'Ativo' : 'Inativo'}
