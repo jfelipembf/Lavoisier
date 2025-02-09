@@ -1,0 +1,457 @@
+{
+  "notices": {
+    "Jardim I": {
+      "-noticeId1": {
+        "title": "Reunião de Pais",
+        "content": "Reunião para discutir o desempenho dos alunos no primeiro bimestre. Todos os pais devem comparecer.",
+        "date": "2025-02-09T16:22:03.000Z",
+        "time": "14:00",
+        "shift": "Manhã",
+        "createdAt": "2025-02-09T16:22:03.000Z",
+        "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "active"
+      }
+    },
+    "Maternal III": {
+      "-noticeId2": {
+        "title": "Festa Junina",
+        "content": "Preparativos para a festa junina! Traje: roupas confortáveis para dançar.",
+        "date": "2025-02-10T14:00:00.000Z",
+        "time": "15:00",
+        "shift": "Tarde",
+        "createdAt": "2025-02-09T16:22:03.000Z",
+        "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "active"
+      }
+    }
+  },
+  "schedule": {
+    "Jardim I": {
+      "-scheduleId1": {
+        "title": "Aula de Música",
+        "description": "Aula de introdução musical com instrumentos de percussão",
+        "date": "2025-02-10",
+        "startTime": "08:00",
+        "endTime": "09:00",
+        "location": "Sala de Música",
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "type": "regular", 
+        "subject": "Música",
+        "status": "active",
+        "shift": "Manhã",
+        "repeat": {
+          "frequency": "weekly", 
+          "days": ["monday", "wednesday"],
+          "until": "2025-06-30"
+        }
+      },
+      "-scheduleId2": {
+        "title": "Educação Física",
+        "description": "Atividades recreativas e jogos cooperativos",
+        "date": "2025-02-10",
+        "startTime": "09:15",
+        "endTime": "10:00",
+        "location": "Quadra Poliesportiva",
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "type": "regular",
+        "subject": "Educação Física",
+        "status": "active",
+        "shift": "Manhã",
+        "repeat": {
+          "frequency": "weekly",
+          "days": ["monday", "friday"],
+          "until": "2025-06-30"
+        }
+      }
+    },
+    "Maternal III": {
+      "-scheduleId3": {
+        "title": "Hora do Conto",
+        "description": "Contação de histórias e atividades de interpretação",
+        "date": "2025-02-10",
+        "startTime": "13:30",
+        "endTime": "14:30",
+        "location": "Biblioteca",
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "type": "regular",
+        "subject": "Português",
+        "status": "active",
+        "shift": "Tarde",
+        "repeat": {
+          "frequency": "weekly",
+          "days": ["tuesday", "thursday"],
+          "until": "2025-06-30"
+        }
+      }
+    }
+  },
+  "activities": {
+    "Jardim I": {
+      "-activityId1": {
+        "title": "Coordenação Motora",
+        "type": "classroom", 
+        "date": "2025-02-10",
+        "subject": "Coordenação Motora",
+        "description": "Atividade de recorte e colagem com formas geométricas",
+        "details": {
+          "materialsUsed": ["Tesoura sem ponta", "Cola", "Papel colorido"],
+          "objectives": ["Desenvolver coordenação motora fina", "Reconhecer formas geométricas"],
+          "completed": true,
+          "teacherNotes": "O aluno demonstrou boa habilidade com a tesoura"
+        },
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "completed",
+        "shift": "Manhã",
+        "studentProgress": {
+          "-OI83aT8nL5QBMVKQvnG": {
+            "completed": true,
+            "performance": "excellent", 
+            "teacherComments": "Excelente trabalho com as formas geométricas",
+            "photos": ["url1", "url2"]
+          }
+        }
+      },
+      "-activityId2": {
+        "title": "Lição de Casa - Alfabeto",
+        "type": "homework",
+        "date": "2025-02-10",
+        "dueDate": "2025-02-11",
+        "subject": "Português",
+        "description": "Praticar a escrita das letras do alfabeto",
+        "details": {
+          "materialsNeeded": ["Caderno de caligrafia", "Lápis"],
+          "instructions": [
+            "1. Copiar cada letra 3 vezes",
+            "2. Desenhar um objeto que comece com cada letra"
+          ],
+          "parentInstructions": "Auxiliar a criança na identificação dos objetos",
+          "pages": "Páginas 10-12 do caderno de caligrafia"
+        },
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "pending",
+        "shift": "Manhã",
+        "studentProgress": {
+          "-OI83aT8nL5QBMVKQvnG": {
+            "completed": false,
+            "submittedDate": null,
+            "parentFeedback": null,
+            "teacherFeedback": null
+          }
+        }
+      }
+    },
+    "Maternal III": {
+      "-activityId3": {
+        "title": "Contagem com Blocos",
+        "type": "classroom",
+        "date": "2025-02-10",
+        "subject": "Matemática",
+        "description": "Atividade de contagem usando blocos coloridos",
+        "details": {
+          "materialsUsed": ["Blocos lógicos", "Folha de atividade"],
+          "objectives": ["Desenvolver noção numérica", "Identificar cores"],
+          "completed": true,
+          "teacherNotes": "Atividade realizada em grupo"
+        },
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "completed",
+        "shift": "Tarde",
+        "studentProgress": {
+          "-OIS3ncMIr-GxnrllOso": {
+            "completed": true,
+            "performance": "good",
+            "teacherComments": "Boa participação na atividade em grupo",
+            "photos": ["url3"]
+          }
+        }
+      },
+      "-activityId4": {
+        "title": "Lição de Casa - Cores",
+        "type": "homework",
+        "date": "2025-02-10",
+        "dueDate": "2025-02-11",
+        "subject": "Artes",
+        "description": "Identificar e pintar objetos com suas cores corretas",
+        "details": {
+          "materialsNeeded": ["Folha de atividade", "Lápis de cor"],
+          "instructions": [
+            "1. Identificar os objetos do dia-a-dia",
+            "2. Pintar cada objeto com sua cor natural"
+          ],
+          "parentInstructions": "Conversar sobre as cores dos objetos antes de pintar",
+          "pages": "Folha de atividade anexa"
+        },
+        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+        "status": "pending",
+        "shift": "Tarde",
+        "studentProgress": {
+          "-OIS3ncMIr-GxnrllOso": {
+            "completed": false,
+            "submittedDate": null,
+            "parentFeedback": null,
+            "teacherFeedback": null
+          }
+        }
+      }
+    }
+  },
+  "schollData": {
+    "Adress": "",
+    "CNPJ": "",
+    "SchoolName": "Colégio Lavoisier"
+  },
+  "users": {
+    "-OI83aT8nL5QBMVKQvnG": {
+      "emailId": "Lucas@gmail.com",
+      "id": "fcf1bfe4-992e-4e8b-9a37-2298557bcc9b",
+      "img": "",
+      "name": "Lucas guimaraes",
+      "password": "123456",
+      "tokenId": "",
+      "role": "student",
+      "schoolYear": "Jardim I",
+      "shift": "Manhã"
+    },
+    "-OIGpHMA7ewnsbC8Yy3W": {
+      "emailId": "Zamaguimaraes@gmail.com",
+      "id": "9c1aaef3-5277-4249-9145-83e0ebec3991",
+      "img": "",
+      "name": "Zama",
+      "password": "123456",
+      "tokenId": "",
+      "role": "teacher",
+      "schoolYear": "Jardim I",
+      "shift": "Manhã"
+    },
+    "-OIS3ncMIr-GxnrllOso": {
+      "emailId": "ze@gmail.com",
+      "name": "Ze felipe",
+      "password": "123456",
+      "role": "student",
+      "schoolYear": "Maternal III",
+      "shift": "Tarde"
+    },
+    "b168eab7-9c59-4966-88a3-ebb70d67afbb": {
+      "address": "",
+      "bio": "",
+      "birthDate": "16/10/1984",
+      "cep": "49000215",
+      "city": "",
+      "emailId": "jfelipe@gmail.com",
+      "gender": "Masculino",
+      "id": "b168eab7-9c59-4966-88a3-ebb70d67afbb",
+      "img": "https://firebasestorage.googleapis.com/v0/b/lavoisier-73885.firebasestorage.app/o/profile_images%2Fb168eab7-9c59-4966-88a3-ebb70d67afbb?alt=media&token=df1c16e2-11c5-4521-abb8-3fe5529b6727",
+      "languagePreference": "en",
+      "lastLogin": "2025-02-08T15:36:28.353Z",
+      "name": "Felipe",
+      "neighborhood": "",
+      "notas": {
+        "Biologia": {
+          "Unidade1": {
+            "extra": 0,
+            "final": 6,
+            "prova": 4,
+            "simulado": 2,
+            "trabalho": 0
+          },
+          "Unidade2": {
+            "extra": 0,
+            "final": 5,
+            "prova": 4,
+            "simulado": 0,
+            "trabalho": 1
+          },
+          "Unidade3": {
+            "extra": 0,
+            "final": 7,
+            "prova": 4,
+            "simulado": 3,
+            "trabalho": 0
+          },
+          "Unidade4": {
+            "extra": 2,
+            "final": 9,
+            "prova": 7,
+            "simulado": 0,
+            "trabalho": 0
+          }
+        },
+        "Matemática": {
+          "Unidade1": {
+            "extra": 0,
+            "final": 8,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade2": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade3": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade4": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          }
+        },
+        "ciencias": {
+          "Unidade1": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade2": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade3": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade4": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          }
+        },
+        "historia": {
+          "Unidade1": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade2": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade3": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade4": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          }
+        },
+        "portugues": {
+          "Unidade1": {
+            "extra": 2,
+            "final": 8,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade2": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          },
+          "Unidade3": {
+            "extra": 0,
+            "final": 7.5,
+            "prova": 5,
+            "simulado": 2.5,
+            "trabalho": 0
+          },
+          "Unidade4": {
+            "extra": 0,
+            "final": 0,
+            "prova": 0,
+            "simulado": 0,
+            "trabalho": 0
+          }
+        }
+      },
+      "password": "123456",
+      "phone": 0,
+      "schoolYear": "Jardim I",
+      "state": "",
+      "updatedAt": "2025-02-07T13:48:51.561Z"
+    },
+    "f3833a6e-05f7-4b6e-9b91-306f6856c125": {
+      "address": "Rua Gonçalves Panza",
+      "bio": "",
+      "birthDate": "16/10/1984",
+      "cep": "49000215",
+      "city": "Aracaju",
+      "emailId": "Jose@gmail.com",
+      "gender": "Masculino",
+      "id": "f3833a6e-05f7-4b6e-9b91-306f6856c125",
+      "img": "https://firebasestorage.googleapis.com/v0/b/lavoisier-73885.firebasestorage.app/o/profile_images%2Ff3833a6e-05f7-4b6e-9b91-306f6856c125?alt=media&token=47c33be2-7bf0-4ded-b2c2-d858e7e0a57d",
+      "languagePreference": "en",
+      "lastLogin": "2025-02-06T14:38:01.827Z",
+      "name": "Felipe Macedo",
+      "neighborhood": "",
+      "password": "123456",
+      "phone": 79999371622,
+      "role": "Aluno",
+      "schoolYear": "Maternal III",
+      "state": "",
+      "updatedAt": "2025-02-06T14:53:38.725Z"
+    }
+  },
+  "schoolYears": {
+    "active": [
+      "Berçário",
+      "Maternal I",
+      "Maternal II",
+      "Maternal III",
+      "Jardim I",
+      "Jardim II",
+      "1º Ano - Fundamental",
+      "2º Ano - Fundamental",
+      "3º Ano - Fundamental",
+      "4º Ano - Fundamental",
+      "5º Ano - Fundamental",
+      "6º Ano - Fundamental",
+      "7º Ano - Fundamental",
+      "8º Ano - Fundamental",
+      "9º Ano - Fundamental",
+      "1º Ano - Médio",
+      "2º Ano - Médio",
+      "3º Ano - Médio"
+    ]
+  },
+  "shifts": {
+    "active": [
+      "Manhã",
+      "Tarde",
+      "Integral"
+    ]
+  }
+}

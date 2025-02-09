@@ -26,10 +26,6 @@ const Grades = () => {
 
   useEffect(() => {
     if (user?.notas) {
-      console.log('=== GRADES: DADOS DO USUÁRIO ===');
-      console.log('user:', JSON.stringify(user, null, 2));
-      
-      // Usar as notas diretamente do usuário
       setUserGrades(user.notas);
       
       // Inicializar estados de collapse

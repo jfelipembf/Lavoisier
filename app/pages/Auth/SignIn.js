@@ -30,18 +30,23 @@ const SignIn = () => {
             return;
         }
 
+        if (!email.includes('@')) {
+            alert('Por favor, insira um email válido');
+            return;
+        }
+
         setLoading(true);
         try {
-            const userData = await Auth.userLogin(email, password);
+            const userData = await Auth.userLogin(email.toLowerCase().trim(), password);
             if (userData) {
-                // Navega para DrawerNavigation que contém o BottomNavigation
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'DrawerNavigation' }],
                 });
             }
         } catch (error) {
-            alert('Erro ao fazer login. Verifique suas credenciais.');
+            alert(error.message || 'Erro ao fazer login. Verifique suas credenciais.');
+            console.error('Erro no login:', error);
         }
         setLoading(false);
     };

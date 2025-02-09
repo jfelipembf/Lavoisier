@@ -1,15 +1,13 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { FONTS } from '../../constants/theme';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import { useTheme } from '@react-navigation/native';
+import { GlobalStyleSheet } from '../../constants/StyleSheet';
+import { COLORS, FONTS, SIZES } from '../../constants/theme';
+import useNotices from '../../hooks/useNotices';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../layout/Header';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { GlobalStyleSheet } from '../../constants/StyleSheet';
 import { useNavigation } from '@react-navigation/native';
-import moment from 'moment';
-import 'moment/locale/pt-br';
-
-moment.locale('pt-br');
 
 // Cores pastéis personalizadas
 const PASTEL_COLORS = {
@@ -19,119 +17,127 @@ const PASTEL_COLORS = {
     yellow: '#f3dfde',  // Amarelo pastel
 };
 
-const notifications = [
-    {
-        id: 1,
-        title: 'Reunião de Pais',
-        description: 'Reunião geral com os pais para discussão do desempenho dos alunos no primeiro bimestre.',
-        date: '2025-02-15',
-        time: '19:00',
-        type: 'event',
-        read: false
-    },
-    {
-        id: 2,
-        title: 'Prova de Matemática',
-        description: 'Avaliação sobre equações do segundo grau e funções.',
-        date: '2025-02-10',
-        time: '08:00',
-        type: 'exam',
-        read: true
-    },
-    {
-        id: 3,
-        title: 'Feira de Ciências',
-        description: 'Apresentação dos projetos desenvolvidos pelos alunos.',
-        date: '2025-02-20',
-        time: '14:00',
-        type: 'event',
-        read: false
-    },
-    {
-        id: 4,
-        title: 'Recesso Escolar',
-        description: 'Início do recesso escolar do Carnaval.',
-        date: '2025-02-12',
-        type: 'info',
-        read: true
-    }
-];
+const NoticeItem = ({ notice }) => {
+    const [expanded, setExpanded] = useState(false);
+    const [rotateAnimation] = useState(new Animated.Value(0));
 
-const NotificationCard = ({ notification }) => {
-    const getIcon = (type) => {
-        switch(type) {
-            case 'event':
-                return 'calendar';
-            case 'exam':
-                return 'pencil';
-            case 'info':
-                return 'info-circle';
-            default:
-                return 'bell';
-        }
+    const handleExpand = () => {
+        setExpanded(!expanded);
+        Animated.spring(rotateAnimation, {
+            toValue: expanded ? 0 : 1,
+            useNativeDriver: true,
+        }).start();
     };
 
-    const getColor = (type) => {
-        switch(type) {
-            case 'event':
-                return PASTEL_COLORS.blue;
-            case 'exam':
-                return PASTEL_COLORS.red;
-            case 'info':
-                return PASTEL_COLORS.green;
-            default:
-                return PASTEL_COLORS.yellow;
-        }
-    };
-
+    const rotate = rotateAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg'],
+    });
+    
     return (
-        <View style={[styles.notificationCard, { borderLeftColor: getColor(notification.type) }]}>
-            <View style={styles.iconContainer}>
-                <FontAwesome 
-                    name={getIcon(notification.type)} 
-                    size={20} 
-                    color="#666666" 
-                />
+        <View style={[styles.noticeContainer, { borderLeftColor: PASTEL_COLORS.blue }]}>
+            <View style={[styles.iconContainer, { backgroundColor: PASTEL_COLORS.blue }]}>
+                <FontAwesome name="bell" size={24} color="#666666" />
             </View>
             <View style={styles.contentContainer}>
-                <Text style={styles.title}>{notification.title}</Text>
-                <Text style={styles.description}>{notification.description}</Text>
-                <View style={styles.dateContainer}>
-                    <FontAwesome name="clock-o" size={14} color="#666666" style={styles.dateIcon} />
-                    <Text style={styles.dateText}>
-                        {moment(notification.date).format('DD [de] MMMM')}
-                        {notification.time ? ` às ${notification.time}` : ''}
+                <Text style={styles.noticeTitle} numberOfLines={expanded ? undefined : 1}>{notice.title}</Text>
+                <Text style={styles.noticeContent} numberOfLines={expanded ? undefined : 2}>{notice.content}</Text>
+                {expanded && (
+                    <View style={styles.expandedContent}>
+                        <Text style={styles.expandedLabel}>Turno:</Text>
+                        <Text style={styles.expandedValue}>{notice.shift}</Text>
+                        
+                        <Text style={styles.expandedLabel}>Status:</Text>
+                        <Text style={[styles.expandedValue, { color: notice.status === 'active' ? COLORS.success : COLORS.danger }]}>
+                            {notice.status === 'active' ? 'Ativo' : 'Inativo'}
+                        </Text>
+                    </View>
+                )}
+                <View style={styles.footer}>
+                    <Text style={styles.noticeDate}>
+                        {new Date(notice.date).toLocaleDateString()}
                     </Text>
+                    <Text style={styles.noticeTime}>{notice.time}</Text>
                 </View>
             </View>
-            {!notification.read && <View style={styles.unreadDot} />}
+            <TouchableOpacity onPress={handleExpand} style={styles.arrowButton}>
+                <Animated.View style={{ transform: [{ rotate }] }}>
+                    <FontAwesome name="angle-right" size={24} color="#666666" />
+                </Animated.View>
+            </TouchableOpacity>
         </View>
     );
 };
 
 const Notifications = () => {
+    const { colors } = useTheme();
+    const { notices, loading, error } = useNotices();
     const navigation = useNavigation();
+
+    if (loading) {
+        return (
+            <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
+                <Header 
+                    titleLeft
+                    title={'Avisos'} 
+                    leftIcon="back"
+                    onPressLeft={() => navigation.goBack()}
+                />
+                <View style={styles.centerContent}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
+                <Header 
+                    titleLeft
+                    title={'Avisos'} 
+                    leftIcon="back"
+                    onPressLeft={() => navigation.goBack()}
+                />
+                <View style={styles.centerContent}>
+                    <Text style={styles.errorText}>Erro ao carregar avisos</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (!notices || notices.length === 0) {
+        return (
+            <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
+                <Header 
+                    titleLeft
+                    title={'Avisos'} 
+                    leftIcon="back"
+                    onPressLeft={() => navigation.goBack()}
+                />
+                <View style={styles.centerContent}>
+                    <Text style={styles.emptyText}>Nenhum aviso disponível</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
             <Header 
+                titleLeft
                 title={'Avisos'} 
-                titleLeft 
                 leftIcon="back"
                 onPressLeft={() => navigation.goBack()}
             />
-            
             <ScrollView 
                 style={{backgroundColor: '#FFFFFF'}} 
                 contentContainerStyle={{paddingBottom: 100}}
             >
                 <View style={{flex:1, backgroundColor: '#FFFFFF'}}>
                     <View style={GlobalStyleSheet.container}>
-                        {notifications.map(notification => (
-                            <NotificationCard 
-                                key={notification.id} 
-                                notification={notification} 
-                            />
+                        {notices.map((item) => (
+                            <NoticeItem key={item.id} notice={item} />
                         ))}
                     </View>
                 </View>
@@ -141,57 +147,86 @@ const Notifications = () => {
 };
 
 const styles = StyleSheet.create({
-    notificationCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 8,
-        marginBottom: 12,
-        padding: 15,
+    centerContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 20
+    },
+    noticeContainer: {
         flexDirection: 'row',
-        borderWidth: 1,
-        borderColor: '#E5E5E5',
-        borderLeftWidth: 4,
+        backgroundColor: COLORS.white,
+        borderRadius: SIZES.radius,
+        padding: 15,
+        marginBottom: 15,
+        elevation: 2,
+        borderLeftWidth: 5,
+        alignItems: 'flex-start'
     },
     iconContainer: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#F5F5F5',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12
+        marginRight: 15
     },
     contentContainer: {
-        flex: 1
+        flex: 1,
+        marginRight: 10
     },
-    title: {
+    noticeTitle: {
         ...FONTS.h6,
         color: '#333333',
-        marginBottom: 4
+        marginBottom: 5
     },
-    description: {
-        ...FONTS.fontXs,
+    noticeContent: {
+        ...FONTS.font,
         color: '#666666',
-        marginBottom: 8
+        marginBottom: 10
     },
-    dateContainer: {
+    footer: {
         flexDirection: 'row',
-        alignItems: 'center'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 10
     },
-    dateIcon: {
-        marginRight: 4
-    },
-    dateText: {
-        ...FONTS.fontXs,
+    noticeDate: {
+        ...FONTS.fontSm,
         color: '#666666'
     },
-    unreadDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: PASTEL_COLORS.blue,
-        position: 'absolute',
-        top: 8,
-        right: 8
+    noticeTime: {
+        ...FONTS.fontSm,
+        color: COLORS.primary
+    },
+    emptyText: {
+        ...FONTS.font,
+        color: '#666666',
+        textAlign: 'center'
+    },
+    errorText: {
+        ...FONTS.font,
+        color: COLORS.danger,
+        textAlign: 'center'
+    },
+    expandedContent: {
+        marginTop: 10,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#eee'
+    },
+    expandedLabel: {
+        ...FONTS.fontSm,
+        color: '#666666',
+        marginTop: 5
+    },
+    expandedValue: {
+        ...FONTS.font,
+        color: '#333333',
+        marginBottom: 5
+    },
+    arrowButton: {
+        padding: 5
     }
 });
 
