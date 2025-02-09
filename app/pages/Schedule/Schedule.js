@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Checkbox from 'expo-checkbox';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import Header from '../../layout/Header';
@@ -20,12 +19,16 @@ const PASTEL_COLORS = {
     green: '#eae3ef',   // Verde pastel
     red: '#f2eee9',     // Vermelho pastel
     yellow: '#f3dfde',  // Amarelo pastel
+    primary: '#e6f3f5', // Primary pastel
+    text: '#666666',    // Texto suave
+    border: '#e5e5e5'   // Borda suave
 };
 
 const Schedule = () => {
     const navigation = useNavigation();
     const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
     const [isCalendarCollapsed, setIsCalendarCollapsed] = useState(true);
+    const [updatingActivity, setUpdatingActivity] = useState(null);
     const { activities, loading, error, markActivityAsComplete, getActivityStats } = useSchedule();
 
     const onDayPress = (day) => {
@@ -40,18 +43,41 @@ const Schedule = () => {
         );
 
         const homeworkActivities = activities.homework.filter(activity => 
-            moment(activity.date).format('YYYY-MM-DD') === selectedDate ||
-            moment(activity.dueDate).format('YYYY-MM-DD') === selectedDate
+            moment(activity.date).format('YYYY-MM-DD') === selectedDate
         );
 
-        return { classroomActivities, homeworkActivities };
+        return [...classroomActivities, ...homeworkActivities];
+    };
+
+    const getFilteredStats = () => {
+        const classroomActivities = activities.classroom.filter(activity => 
+            moment(activity.date).format('YYYY-MM-DD') === selectedDate
+        );
+        const homeworkActivities = activities.homework.filter(activity => 
+            moment(activity.date).format('YYYY-MM-DD') === selectedDate
+        );
+
+        return {
+            classroom: {
+                total: classroomActivities.length,
+                completed: classroomActivities.filter(a => a.progress?.completed).length
+            },
+            homework: {
+                total: homeworkActivities.length,
+                completed: homeworkActivities.filter(a => a.progress?.completed).length
+            }
+        };
     };
 
     const handleToggleActivity = async (activity) => {
         try {
-            await markActivityAsComplete(activity.id, activity.schoolYear);
+            setUpdatingActivity(activity.id);
+            await markActivityAsComplete(activity);
+            // O estado será atualizado automaticamente pelo listener do Firebase
         } catch (error) {
-            console.error('Erro ao marcar atividade:', error);
+            Alert.alert('Erro', 'Não foi possível atualizar a atividade: ' + error.message);
+        } finally {
+            setUpdatingActivity(null);
         }
     };
 
@@ -66,36 +92,48 @@ const Schedule = () => {
                 {activities.map((activity) => (
                     <TouchableOpacity 
                         key={activity.id} 
-                        style={styles.activityCard}
+                        style={[
+                            styles.activityCard,
+                            updatingActivity === activity.id && styles.activityCardUpdating
+                        ]}
                         onPress={() => handleToggleActivity(activity)}
+                        disabled={updatingActivity === activity.id}
                     >
                         <View style={styles.activityHeader}>
-                            <Text style={styles.activityTime}>
-                                {type === 'classroom' 
-                                    ? moment(activity.date).format('HH:mm')
-                                    : `Entrega: ${moment(activity.dueDate).format('DD/MM')}`
-                                }
-                            </Text>
-                            <Checkbox
-                                value={activity.progress.completed}
-                                onValueChange={() => handleToggleActivity(activity)}
-                                color={activity.progress.completed ? color : undefined}
-                                style={styles.checkbox}
-                            />
+                            <View style={styles.activityTimeContainer}>
+                                <Text style={styles.activityTime}>
+                                    {type === 'classroom' 
+                                        ? moment(activity.date).format('HH:mm')
+                                        : `Entrega: ${moment(activity.dueDate).format('DD/MM')}`
+                                    }
+                                </Text>
+                                {activity.subject && (
+                                    <Text style={styles.activitySubject}>{activity.subject}</Text>
+                                )}
+                            </View>
+                            <TouchableOpacity 
+                                onPress={() => handleToggleActivity(activity)}
+                                style={[
+                                    styles.customCheckbox,
+                                    activity.progress?.completed && styles.customCheckboxChecked,
+                                    { borderColor: color }
+                                ]}
+                                disabled={updatingActivity === activity.id}
+                            >
+                                {activity.progress?.completed && (
+                                    <View style={[styles.checkboxInner, { backgroundColor: color }]} />
+                                )}
+                                {updatingActivity === activity.id && (
+                                    <ActivityIndicator 
+                                        size="small" 
+                                        color={color}
+                                        style={styles.checkboxLoading}
+                                    />
+                                )}
+                            </TouchableOpacity>
                         </View>
                         <Text style={styles.activityTitle}>{activity.title}</Text>
                         <Text style={styles.activityDescription}>{activity.description}</Text>
-                        {activity.progress.completed && (
-                            <View style={styles.completedInfo}>
-                                <FontAwesome name="check-circle" size={16} color={COLORS.success} />
-                                <Text style={styles.completedText}>
-                                    {type === 'classroom' 
-                                        ? `Concluído - ${activity.progress.performance}`
-                                        : `Entregue em ${moment(activity.progress.submittedDate).format('DD/MM')}`
-                                    }
-                                </Text>
-                            </View>
-                        )}
                         {activity.details && (
                             <View style={styles.details}>
                                 {activity.details.materialsNeeded && (
@@ -112,23 +150,49 @@ const Schedule = () => {
                                 )}
                             </View>
                         )}
+                        {activity.progress?.completed && (
+                            <View style={styles.completedInfo}>
+                                <FontAwesome name="check-circle" size={16} color={color} />
+                                <Text style={[styles.completedText, { color }]}>
+                                    {type === 'classroom' 
+                                        ? `Concluído ${activity.progress.updatedAt ? `em ${moment(activity.progress.updatedAt).format('DD/MM HH:mm')}` : ''}`
+                                        : `Entregue ${activity.progress.submittedDate ? `em ${moment(activity.progress.submittedDate).format('DD/MM HH:mm')}` : ''}`
+                                    }
+                                </Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                 ))}
             </View>
         );
     };
 
+    const renderStats = () => {
+        const stats = getFilteredStats();
+        return (
+            <View style={styles.statsContainer}>
+                <View style={styles.statCard}>
+                    <Text style={styles.statTitle}>Atividades em Sala</Text>
+                    <Text style={styles.statValue}>
+                        {stats.classroom.total === 0 ? '0/0' : `${stats.classroom.completed}/${stats.classroom.total}`}
+                    </Text>
+                </View>
+                <View style={styles.statCard}>
+                    <Text style={styles.statTitle}>Tarefas de Casa</Text>
+                    <Text style={styles.statValue}>
+                        {stats.homework.total === 0 ? '0/0' : `${stats.homework.completed}/${stats.homework.total}`}
+                    </Text>
+                </View>
+            </View>
+        );
+    };
+
     if (loading) {
         return (
-            <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
-                <Header 
-                    title={'Agenda'} 
-                    titleLeft 
-                    leftIcon="back"
-                    onPressLeft={() => navigation.goBack()}
-                />
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.primary} />
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+                <Header title="Agenda" leftIcon="back" />
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color={PASTEL_COLORS.primary} />
                 </View>
             </SafeAreaView>
         );
@@ -136,22 +200,22 @@ const Schedule = () => {
 
     if (error) {
         return (
-            <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
-                <Header 
-                    title={'Agenda'} 
-                    titleLeft 
-                    leftIcon="back"
-                    onPressLeft={() => navigation.goBack()}
-                />
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>Erro ao carregar atividades: {error}</Text>
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+                <Header title="Agenda" leftIcon="back" />
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+                    <Text style={{ color: COLORS.danger, textAlign: 'center', marginBottom: 10 }}>
+                        Ops! Algo deu errado.
+                    </Text>
+                    <Text style={{ color: COLORS.text, textAlign: 'center' }}>
+                        {error}
+                    </Text>
                 </View>
             </SafeAreaView>
         );
     }
 
-    const { classroomActivities, homeworkActivities } = getFilteredActivities();
-    const stats = getActivityStats();
+    const filteredActivities = getFilteredActivities();
+    const stats = getFilteredStats();
 
     return (
         <SafeAreaView style={[GlobalStyleSheet.container, {padding:0, flex:1, backgroundColor: '#FFFFFF'}]}>
@@ -182,32 +246,48 @@ const Schedule = () => {
                         <Calendar
                             onDayPress={onDayPress}
                             markedDates={{
-                                [selectedDate]: {selected: true, selectedColor: COLORS.primary}
+                                [selectedDate]: {
+                                    selected: true,
+                                    selectedColor: PASTEL_COLORS.primary,
+                                    selectedTextColor: PASTEL_COLORS.text
+                                }
                             }}
                             theme={{
-                                selectedDayBackgroundColor: COLORS.primary,
-                                todayTextColor: COLORS.primary,
-                                arrowColor: COLORS.primary,
+                                backgroundColor: '#ffffff',
+                                calendarBackground: '#ffffff',
+                                textSectionTitleColor: PASTEL_COLORS.text,
+                                selectedDayBackgroundColor: PASTEL_COLORS.primary,
+                                selectedDayTextColor: PASTEL_COLORS.text,
+                                todayTextColor: PASTEL_COLORS.text,
+                                dayTextColor: '#2d4150',
+                                textDisabledColor: '#d9e1e8',
+                                dotColor: PASTEL_COLORS.primary,
+                                selectedDotColor: PASTEL_COLORS.text,
+                                arrowColor: PASTEL_COLORS.text,
+                                monthTextColor: PASTEL_COLORS.text,
+                                textDayFontFamily: 'System',
+                                textMonthFontFamily: 'System',
+                                textDayHeaderFontFamily: 'System',
+                                textDayFontSize: 16,
+                                textMonthFontSize: 16,
+                                textDayHeaderFontSize: 14
+                            }}
+                            style={{
+                                borderRadius: 10,
+                                padding: 10,
+                                backgroundColor: '#ffffff',
+                                marginBottom: 15
                             }}
                         />
                     </Collapsible>
 
-                    <View style={styles.statsContainer}>
-                        <View style={[styles.statCard, { backgroundColor: PASTEL_COLORS.blue }]}>
-                            <Text style={styles.statTitle}>Atividades em Sala</Text>
-                            <Text style={styles.statValue}>{stats.classroom.completed}/{stats.classroom.total}</Text>
-                        </View>
-                        <View style={[styles.statCard, { backgroundColor: PASTEL_COLORS.green }]}>
-                            <Text style={styles.statTitle}>Tarefas de Casa</Text>
-                            <Text style={styles.statValue}>{stats.homework.completed}/{stats.homework.total}</Text>
-                        </View>
-                    </View>
+                    {renderStats()}
 
                     <View style={GlobalStyleSheet.container}>
-                        {renderActivitySection('Atividades em Sala', classroomActivities, 'classroom', PASTEL_COLORS.blue)}
-                        {renderActivitySection('Tarefas de Casa', homeworkActivities, 'homework', PASTEL_COLORS.green)}
+                        {filteredActivities.filter(activity => activity.type === 'classroom').length > 0 && renderActivitySection('Atividades em Sala', filteredActivities.filter(activity => activity.type === 'classroom'), 'classroom', PASTEL_COLORS.blue)}
+                        {filteredActivities.filter(activity => activity.type === 'homework').length > 0 && renderActivitySection('Tarefas de Casa', filteredActivities.filter(activity => activity.type === 'homework'), 'homework', PASTEL_COLORS.green)}
                         
-                        {classroomActivities.length === 0 && homeworkActivities.length === 0 && (
+                        {filteredActivities.length === 0 && (
                             <View style={styles.emptyContainer}>
                                 <Text style={styles.emptyText}>Nenhuma atividade para esta data</Text>
                             </View>
@@ -252,15 +332,26 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         elevation: 2
     },
+    activityCardUpdating: {
+        opacity: 0.7
+    },
     activityHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 10
     },
+    activityTimeContainer: {
+        flex: 1
+    },
     activityTime: {
         ...FONTS.fontSm,
         color: '#666666'
+    },
+    activitySubject: {
+        ...FONTS.fontSm,
+        color: '#666666',
+        marginTop: 2
     },
     activityTitle: {
         ...FONTS.h6,
@@ -271,33 +362,37 @@ const styles = StyleSheet.create({
         ...FONTS.font,
         color: '#666666'
     },
-    checkbox: {
-        marginLeft: 10
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    errorContainer: {
-        flex: 1,
+    customCheckbox: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20
+        marginLeft: 10
     },
-    errorText: {
-        ...FONTS.font,
-        color: COLORS.danger,
-        textAlign: 'center'
+    customCheckboxChecked: {
+        borderWidth: 2,
     },
-    emptyContainer: {
-        padding: 20,
-        alignItems: 'center'
+    checkboxInner: {
+        width: 14,
+        height: 14,
+        borderRadius: 7,
     },
-    emptyText: {
-        ...FONTS.font,
-        color: '#666666',
-        textAlign: 'center'
+    checkboxLoading: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%'
+    },
+    completedInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8
+    },
+    completedText: {
+        marginLeft: 8,
+        fontSize: 14,
+        fontWeight: '500'
     },
     statsContainer: {
         flexDirection: 'row',
@@ -320,34 +415,30 @@ const styles = StyleSheet.create({
         ...FONTS.h6,
         color: '#333333'
     },
-    completedInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-        paddingTop: 10,
-        borderTopWidth: 1,
-        borderTopColor: '#eee'
+    emptyContainer: {
+        padding: 20,
+        alignItems: 'center'
     },
-    completedText: {
-        ...FONTS.fontSm,
-        color: COLORS.success,
-        marginLeft: 5
+    emptyText: {
+        ...FONTS.font,
+        color: '#666666',
+        textAlign: 'center'
     },
     details: {
-        marginTop: 10,
-        paddingTop: 10,
+        marginTop: 8,
+        paddingTop: 8,
         borderTopWidth: 1,
         borderTopColor: '#eee'
+    },
+    detailsLabel: {
+        fontWeight: '600',
+        color: '#333'
     },
     detailsText: {
         ...FONTS.fontSm,
         color: '#666666',
-        marginBottom: 5
+        marginBottom: 4
     },
-    detailsLabel: {
-        ...FONTS.fontSm,
-        fontWeight: 'bold'
-    }
 });
 
 export default Schedule;

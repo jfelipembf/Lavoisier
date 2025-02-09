@@ -1,204 +1,101 @@
 {
-  "notices": {
-    "Jardim I": {
-      "-noticeId1": {
-        "title": "Reunião de Pais",
-        "content": "Reunião para discutir o desempenho dos alunos no primeiro bimestre. Todos os pais devem comparecer.",
-        "date": "2025-02-09T16:22:03.000Z",
-        "time": "14:00",
-        "shift": "Manhã",
-        "createdAt": "2025-02-09T16:22:03.000Z",
-        "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "active"
-      }
-    },
-    "Maternal III": {
-      "-noticeId2": {
-        "title": "Festa Junina",
-        "content": "Preparativos para a festa junina! Traje: roupas confortáveis para dançar.",
-        "date": "2025-02-10T14:00:00.000Z",
-        "time": "15:00",
-        "shift": "Tarde",
-        "createdAt": "2025-02-09T16:22:03.000Z",
-        "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "active"
-      }
+  "schools": {
+    "lavoisier-aracaju": {
+      "name": "Colégio Lavoisier - Aracaju",
+      "address": "Rua Principal, 123",
+      "city": "Aracaju",
+      "state": "SE"
     }
   },
-  "schedule": {
-    "Jardim I": {
-      "-scheduleId1": {
-        "title": "Aula de Música",
-        "description": "Aula de introdução musical com instrumentos de percussão",
-        "date": "2025-02-10",
-        "startTime": "08:00",
-        "endTime": "09:00",
-        "location": "Sala de Música",
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "type": "regular", 
-        "subject": "Música",
-        "status": "active",
-        "shift": "Manhã",
-        "repeat": {
-          "frequency": "weekly", 
-          "days": ["monday", "wednesday"],
-          "until": "2025-06-30"
+  "classes": {
+    "lavoisier-aracaju": {
+      "Jardim I": {
+        "A": {
+          "shift": "Manhã",
+          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+          "students": ["-OI83aT8nL5QBMVKQvnG"]
+        },
+        "B": {
+          "shift": "Tarde",
+          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+          "students": ["-OIS3ncMIr-GxnrllOso"]
         }
       },
-      "-scheduleId2": {
-        "title": "Educação Física",
-        "description": "Atividades recreativas e jogos cooperativos",
-        "date": "2025-02-10",
-        "startTime": "09:15",
-        "endTime": "10:00",
-        "location": "Quadra Poliesportiva",
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "type": "regular",
-        "subject": "Educação Física",
-        "status": "active",
-        "shift": "Manhã",
-        "repeat": {
-          "frequency": "weekly",
-          "days": ["monday", "friday"],
-          "until": "2025-06-30"
-        }
-      }
-    },
-    "Maternal III": {
-      "-scheduleId3": {
-        "title": "Hora do Conto",
-        "description": "Contação de histórias e atividades de interpretação",
-        "date": "2025-02-10",
-        "startTime": "13:30",
-        "endTime": "14:30",
-        "location": "Biblioteca",
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "type": "regular",
-        "subject": "Português",
-        "status": "active",
-        "shift": "Tarde",
-        "repeat": {
-          "frequency": "weekly",
-          "days": ["tuesday", "thursday"],
-          "until": "2025-06-30"
+      "Maternal III": {
+        "A": {
+          "shift": "Manhã",
+          "teacher": "-OIGpHMA7ewnsbC8Yy3W",
+          "students": []
         }
       }
     }
   },
   "activities": {
-    "Jardim I": {
-      "-activityId1": {
-        "title": "Coordenação Motora",
-        "type": "classroom", 
-        "date": "2025-02-10",
-        "subject": "Coordenação Motora",
-        "description": "Atividade de recorte e colagem com formas geométricas",
-        "details": {
-          "materialsUsed": ["Tesoura sem ponta", "Cola", "Papel colorido"],
-          "objectives": ["Desenvolver coordenação motora fina", "Reconhecer formas geométricas"],
-          "completed": true,
-          "teacherNotes": "O aluno demonstrou boa habilidade com a tesoura"
-        },
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "completed",
-        "shift": "Manhã",
-        "studentProgress": {
-          "-OI83aT8nL5QBMVKQvnG": {
-            "completed": true,
-            "performance": "excellent", 
-            "teacherComments": "Excelente trabalho com as formas geométricas",
-            "photos": ["url1", "url2"]
-          }
-        }
-      },
-      "-activityId2": {
-        "title": "Lição de Casa - Alfabeto",
-        "type": "homework",
-        "date": "2025-02-10",
-        "dueDate": "2025-02-11",
-        "subject": "Português",
-        "description": "Praticar a escrita das letras do alfabeto",
-        "details": {
-          "materialsNeeded": ["Caderno de caligrafia", "Lápis"],
-          "instructions": [
-            "1. Copiar cada letra 3 vezes",
-            "2. Desenhar um objeto que comece com cada letra"
-          ],
-          "parentInstructions": "Auxiliar a criança na identificação dos objetos",
-          "pages": "Páginas 10-12 do caderno de caligrafia"
-        },
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "pending",
-        "shift": "Manhã",
-        "studentProgress": {
-          "-OI83aT8nL5QBMVKQvnG": {
-            "completed": false,
-            "submittedDate": null,
-            "parentFeedback": null,
-            "teacherFeedback": null
-          }
-        }
-      }
-    },
-    "Maternal III": {
-      "-activityId3": {
-        "title": "Contagem com Blocos",
-        "type": "classroom",
-        "date": "2025-02-10",
-        "subject": "Matemática",
-        "description": "Atividade de contagem usando blocos coloridos",
-        "details": {
-          "materialsUsed": ["Blocos lógicos", "Folha de atividade"],
-          "objectives": ["Desenvolver noção numérica", "Identificar cores"],
-          "completed": true,
-          "teacherNotes": "Atividade realizada em grupo"
-        },
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "completed",
-        "shift": "Tarde",
-        "studentProgress": {
-          "-OIS3ncMIr-GxnrllOso": {
-            "completed": true,
-            "performance": "good",
-            "teacherComments": "Boa participação na atividade em grupo",
-            "photos": ["url3"]
-          }
-        }
-      },
-      "-activityId4": {
-        "title": "Lição de Casa - Cores",
-        "type": "homework",
-        "date": "2025-02-10",
-        "dueDate": "2025-02-11",
-        "subject": "Artes",
-        "description": "Identificar e pintar objetos com suas cores corretas",
-        "details": {
-          "materialsNeeded": ["Folha de atividade", "Lápis de cor"],
-          "instructions": [
-            "1. Identificar os objetos do dia-a-dia",
-            "2. Pintar cada objeto com sua cor natural"
-          ],
-          "parentInstructions": "Conversar sobre as cores dos objetos antes de pintar",
-          "pages": "Folha de atividade anexa"
-        },
-        "teacher": "-OIGpHMA7ewnsbC8Yy3W",
-        "status": "pending",
-        "shift": "Tarde",
-        "studentProgress": {
-          "-OIS3ncMIr-GxnrllOso": {
-            "completed": false,
-            "submittedDate": null,
-            "parentFeedback": null,
-            "teacherFeedback": null
+    "lavoisier-aracaju": {
+      "Jardim I": {
+        "A": {
+          "-activityId1": {
+            "title": "Coordenação Motora",
+            "type": "classroom", 
+            "date": "2025-02-10",
+            "subject": "Coordenação Motora",
+            "description": "Atividade de recorte e colagem com formas geométricas",
+            "shift": "Manhã",
+            "details": {
+              "materialsNeeded": ["Tesoura sem ponta", "Cola", "Papel colorido"],
+              "objectives": ["Desenvolver coordenação motora fina", "Reconhecer formas geométricas"]
+            },
+            "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+            "createdAt": "2025-02-09T15:12:11-03:00"
+          },
+          "-activityId2": {
+            "title": "Tarefa de Casa - Formas Geométricas",
+            "type": "homework",
+            "date": "2025-02-10",
+            "dueDate": "2025-02-11",
+            "subject": "Matemática",
+            "description": "Identificar e colorir formas geométricas",
+            "shift": "Manhã",
+            "details": {
+              "pages": "Páginas 10-12 do livro de atividades",
+              "objectives": ["Fixar conhecimento sobre formas geométricas"]
+            },
+            "createdBy": "-OIGpHMA7ewnsbC8Yy3W",
+            "createdAt": "2025-02-09T15:12:11-03:00"
           }
         }
       }
     }
   },
-  "schollData": {
-    "Adress": "",
-    "CNPJ": "",
-    "SchoolName": "Colégio Lavoisier"
+  "activityProgress": {
+    "lavoisier-aracaju": {
+      "Jardim I": {
+        "A": {
+          "-activityId1": {
+            "-OI83aT8nL5QBMVKQvnG": {
+              "completed": true,
+              "updatedAt": "2025-02-09T15:12:11-03:00"
+            },
+            "b168eab7-9c59-4966-88a3-ebb70d67afbb": {
+              "completed": false,
+              "updatedAt": "2025-02-09T18:17:50.210Z"
+            }
+          },
+          "-activityId2": {
+            "-OI83aT8nL5QBMVKQvnG": {
+              "completed": true,
+              "submittedDate": "2025-02-09T15:12:11-03:00",
+              "updatedAt": "2025-02-09T15:12:11-03:00"
+            },
+            "b168eab7-9c59-4966-88a3-ebb70d67afbb": {
+              "completed": true,
+              "submittedDate": "2025-02-09T18:18:31.063Z",
+              "updatedAt": "2025-02-09T18:18:31.063Z"
+            }
+          }
+        }
+      }
+    }
   },
   "users": {
     "-OI83aT8nL5QBMVKQvnG": {
@@ -209,7 +106,9 @@
       "password": "123456",
       "tokenId": "",
       "role": "student",
+      "school": "lavoisier-aracaju",
       "schoolYear": "Jardim I",
+      "class": "A",
       "shift": "Manhã"
     },
     "-OIGpHMA7ewnsbC8Yy3W": {
@@ -220,7 +119,9 @@
       "password": "123456",
       "tokenId": "",
       "role": "teacher",
+      "school": "lavoisier-aracaju",
       "schoolYear": "Jardim I",
+      "class": "A",
       "shift": "Manhã"
     },
     "-OIS3ncMIr-GxnrllOso": {
@@ -228,7 +129,9 @@
       "name": "Ze felipe",
       "password": "123456",
       "role": "student",
+      "school": "lavoisier-aracaju",
       "schoolYear": "Maternal III",
+      "class": "A",
       "shift": "Tarde"
     },
     "b168eab7-9c59-4966-88a3-ebb70d67afbb": {
@@ -236,7 +139,7 @@
       "bio": "",
       "birthDate": "16/10/1984",
       "cep": "49000215",
-      "city": "",
+      "city": "Aracaju",
       "emailId": "jfelipe@gmail.com",
       "gender": "Masculino",
       "id": "b168eab7-9c59-4966-88a3-ebb70d67afbb",
@@ -399,7 +302,11 @@
       },
       "password": "123456",
       "phone": 0,
+      "role": "student",
+      "school": "lavoisier-aracaju",
       "schoolYear": "Jardim I",
+      "class": "A",
+      "shift": "Manhã",
       "state": "",
       "updatedAt": "2025-02-07T13:48:51.561Z"
     },
@@ -420,9 +327,10 @@
       "password": "123456",
       "phone": 79999371622,
       "role": "Aluno",
+      "school": "lavoisier-aracaju",
       "schoolYear": "Maternal III",
-      "state": "",
-      "updatedAt": "2025-02-06T14:53:38.725Z"
+      "class": "A",
+      "shift": "Tarde"
     }
   },
   "schoolYears": {

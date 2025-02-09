@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ref, onValue, update } from 'firebase/database';
+import { ref, onValue, update, get } from 'firebase/database';
 import { database } from '../../firebaseConfig';
 import Auth from '../Service/Auth';
 
@@ -18,7 +18,28 @@ const useSchedule = () => {
                     setLoading(false);
                     return;
                 }
-                setUser(JSON.parse(accountData));
+                const userData = JSON.parse(accountData);
+                
+                // Garantir que estamos usando o ID do Firebase
+                if (!userData.firebaseId) {
+                    // Buscar o ID do Firebase usando o email
+                    const userRef = ref(database, 'users');
+                    const snapshot = await get(userRef);
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        const userEntry = Object.entries(users).find(([_, u]) => 
+                            u.emailId && u.emailId.toLowerCase() === userData.emailId.toLowerCase()
+                        );
+                        if (userEntry) {
+                            const [firebaseId] = userEntry;
+                            userData.firebaseId = firebaseId;
+                            // Atualizar o AsyncStorage com o firebaseId
+                            await Auth.setAccount(JSON.stringify(userData));
+                        }
+                    }
+                }
+                
+                setUser(userData);
             } catch (err) {
                 setError('Erro ao carregar usuário: ' + err.message);
                 setLoading(false);
@@ -29,85 +50,129 @@ const useSchedule = () => {
     }, []);
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !user.school || !user.schoolYear || !user.class || !user.shift) {
+            console.log('Dados do usuário incompletos:', user);
+            setError('Dados do usuário incompletos. Necessário: escola, ano escolar, turma e turno.');
+            setLoading(false);
+            return;
+        }
 
-        const activitiesRef = ref(database, `activities/${user.id}`);
+        const activitiesRef = ref(database, `activities/${user.school}/${user.schoolYear}/${user.class}`);
+        const progressRef = ref(database, `activityProgress/${user.school}/${user.schoolYear}/${user.class}`);
         
-        const unsubscribe = onValue(activitiesRef, (snapshot) => {
-            try {
-                const data = snapshot.val();
-                if (data) {
-                    // Organizar atividades por tipo
-                    const classroom = [];
-                    const homework = [];
+        // Função para combinar atividades com progresso
+        const combineActivitiesWithProgress = async (activities, progressSnapshot) => {
+            const progress = progressSnapshot.val() || {};
+            const classroom = [];
+            const homework = [];
 
-                    Object.entries(data).forEach(([schoolYear, yearData]) => {
-                        if (yearData.classroom) {
-                            Object.entries(yearData.classroom).forEach(([id, activity]) => {
-                                classroom.push({
-                                    id,
-                                    schoolYear,
-                                    ...activity
-                                });
-                            });
-                        }
-                        if (yearData.homework) {
-                            Object.entries(yearData.homework).forEach(([id, activity]) => {
-                                homework.push({
-                                    id,
-                                    schoolYear,
-                                    ...activity
-                                });
-                            });
-                        }
-                    });
+            Object.entries(activities).forEach(([id, activity]) => {
+                if (activity.shift === user.shift) {
+                    // Usar o firebaseId se disponível, senão usar o id normal
+                    const userId = user.firebaseId || user.id;
+                    
+                    // Pegar o progresso específico do usuário
+                    const activityProgress = progress[id]?.[userId] || {
+                        completed: false,
+                        updatedAt: null
+                    };
 
-                    setActivities({
-                        classroom: classroom.sort((a, b) => new Date(a.date) - new Date(b.date)),
-                        homework: homework.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                    });
-                } else {
-                    setActivities({ classroom: [], homework: [] });
+                    const activityWithProgress = {
+                        id,
+                        ...activity,
+                        progress: activityProgress
+                    };
+
+                    if (activity.type === 'classroom') {
+                        classroom.push(activityWithProgress);
+                    } else if (activity.type === 'homework') {
+                        homework.push(activityWithProgress);
+                    }
                 }
+            });
+
+            return {
+                classroom: classroom.sort((a, b) => new Date(a.date) - new Date(b.date)),
+                homework: homework.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date))
+            };
+        };
+
+        // Listener para atividades e progresso
+        const unsubscribeActivities = onValue(activitiesRef, async (activitiesSnapshot) => {
+            try {
+                const activitiesData = activitiesSnapshot.val();
+                if (!activitiesData) {
+                    setActivities({ classroom: [], homework: [] });
+                    return;
+                }
+
+                // Buscar progresso atual
+                const progressSnapshot = await get(progressRef);
+                const combinedActivities = await combineActivitiesWithProgress(activitiesData, progressSnapshot);
+                setActivities(combinedActivities);
                 setError(null);
             } catch (err) {
+                console.error('Erro ao carregar atividades:', err);
                 setError('Erro ao carregar atividades: ' + err.message);
             } finally {
                 setLoading(false);
             }
         }, (err) => {
+            console.error('Erro ao observar atividades:', err);
             setError('Erro ao carregar atividades: ' + err.message);
             setLoading(false);
         });
 
-        return () => unsubscribe();
+        // Listener para progresso
+        const unsubscribeProgress = onValue(progressRef, async (progressSnapshot) => {
+            try {
+                // Buscar atividades atuais
+                const activitiesSnapshot = await get(activitiesRef);
+                const activitiesData = activitiesSnapshot.val();
+                if (!activitiesData) return;
+
+                const combinedActivities = await combineActivitiesWithProgress(activitiesData, progressSnapshot);
+                setActivities(combinedActivities);
+                setError(null);
+            } catch (err) {
+                console.error('Erro ao atualizar progresso:', err);
+            }
+        });
+
+        return () => {
+            unsubscribeActivities();
+            unsubscribeProgress();
+        };
     }, [user]);
 
-    const markActivityAsComplete = async (activityId, schoolYear) => {
-        if (!user) {
-            throw new Error('Usuário não autenticado');
-        }
-
-        const activity = [...activities.classroom, ...activities.homework]
-            .find(a => a.id === activityId);
-
-        if (!activity) {
-            throw new Error('Atividade não encontrada');
-        }
-
-        const type = activities.classroom.find(a => a.id === activityId) ? 'classroom' : 'homework';
-        const now = new Date().toISOString();
-
-        const updates = {};
-        updates[`activities/${user.id}/${schoolYear}/${type}/${activityId}/progress/completed`] = !activity.progress.completed;
-        
-        if (type === 'homework') {
-            updates[`activities/${user.id}/${schoolYear}/${type}/${activityId}/progress/submittedDate`] = now;
+    const markActivityAsComplete = async (activity) => {
+        if (!user || !user.school || !user.schoolYear || !user.class) {
+            throw new Error('Dados do usuário incompletos');
         }
 
         try {
+            // Usar o firebaseId se disponível, senão usar o id normal
+            const userId = user.firebaseId || user.id;
+            
+            const updates = {};
+            const path = `activityProgress/${user.school}/${user.schoolYear}/${user.class}/${activity.id}/${userId}`;
+            const now = new Date().toISOString();
+            
+            // Toggle o estado completed
+            const newCompleted = !activity.progress?.completed;
+            
+            updates[`${path}/completed`] = newCompleted;
+            updates[`${path}/updatedAt`] = now;
+            
+            if (activity.type === 'homework' && newCompleted) {
+                updates[`${path}/submittedDate`] = now;
+            }
+
             await update(ref(database), updates);
+            
+            // O estado será atualizado automaticamente pelo listener onValue
         } catch (err) {
+            console.error('Erro ao atualizar atividade:', err);
             throw new Error('Erro ao atualizar atividade: ' + err.message);
         }
     };
@@ -116,11 +181,11 @@ const useSchedule = () => {
         const stats = {
             classroom: {
                 total: activities.classroom.length,
-                completed: activities.classroom.filter(a => a.progress.completed).length
+                completed: activities.classroom.filter(a => a.progress?.completed).length
             },
             homework: {
                 total: activities.homework.length,
-                completed: activities.homework.filter(a => a.progress.completed).length
+                completed: activities.homework.filter(a => a.progress?.completed).length
             }
         };
 

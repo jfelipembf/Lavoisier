@@ -46,22 +46,33 @@ async function userLogin(email, password){
       throw new Error('Email não encontrado');
     }
 
-    const [userId, userData] = userEntry;
+    const [firebaseId, userData] = userEntry;
     
     if (userData.password !== password) {
       throw new Error('Senha incorreta');
     }
 
+    // Garantir que todos os campos necessários estejam presentes
+    const requiredFields = {
+      school: 'lavoisier-aracaju',
+      schoolYear: userData.schoolYear || 'Jardim I',
+      class: userData.class || 'A',
+      shift: userData.shift || 'Manhã',
+      role: userData.role || 'student'
+    };
+
     const updatedUserData = {
       ...userData,
-      id: userId,
+      ...requiredFields,
+      id: userData.id || firebaseId, // Manter o id original se existir
+      firebaseId, // Adicionar o firebaseId
       lastLogin: new Date().toISOString()
     };
     
-    await update(ref(database), {
-      [`users/${userId}`]: updatedUserData
-    });
+    // Atualizar o usuário no banco com os campos necessários
+    await update(ref(database, `users/${firebaseId}`), updatedUserData);
 
+    // Salvar no AsyncStorage com o firebaseId
     await setAccount(JSON.stringify(updatedUserData));
     
     return updatedUserData;
